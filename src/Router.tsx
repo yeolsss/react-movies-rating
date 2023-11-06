@@ -10,6 +10,12 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <Main />,
+        children: [
+          {
+            path: 'movies/:id',
+            element: <Main />,
+          },
+        ],
       },
     ],
   },

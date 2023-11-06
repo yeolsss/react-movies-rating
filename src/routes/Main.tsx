@@ -1,19 +1,18 @@
 import Header from '../components/Header.tsx';
 import styled from 'styled-components';
 import { useQuery } from 'react-query';
-import { getMovies, MovieApi, IMovieList, getMovie } from '../api/MovieApi.tsx';
+import { getMovieDetail, getMovies, IMovieApi, IMovieList, IMovieDetail } from '../api/IMovieApi.tsx';
 import MovieCard from '../components/MovieCard.tsx';
-import { useSelector } from 'react-redux';
-import { selectMovieId } from '../reducers/MovieReducer.tsx';
 import { useState } from 'react';
+import { useMatch } from 'react-router-dom';
 
 
 function Main() {
-  const movieId = useSelector(selectMovieId);
   const { isLoading, data } = useQuery<IMovieList>('moviePopular', getMovies);
 
   const [toggleModal, setToggleModal] = useState(false);
   const [fullSizeModal, setFullSizeModal] = useState(false);
+
 
   // get api
   const handlerOnClickModalToggle = () => {
@@ -27,6 +26,14 @@ function Main() {
     setFullSizeModal(false);
   };
 
+  const bigMovieMatch = useMatch('/movies/:movieId');
+  const movieId = bigMovieMatch?.params.movieId;
+  const {
+    isLoading: isDetailLoading,
+    data: detailData,
+  } = useQuery<IMovieDetail>(['movie', movieId],
+    () => getMovieDetail(movieId || ''), { enabled: !!movieId });
+
   return (
     <>
       <Container>
@@ -38,7 +45,7 @@ function Main() {
             <h1>Loading...!</h1>
           ) : (
             <MovieCards>
-              {data?.results.map((movie: MovieApi) => (
+              {data?.results.map((movie: IMovieApi) => (
                 <MovieCard key={movie.id} movieData={movie} isModalOpen={setToggleModal} />
               ))}
             </MovieCards>
@@ -52,12 +59,22 @@ function Main() {
         <ModalHeader>
           <IconWrapper>
             <div onClick={handlerOnClickModalToggle}></div>
-            <div onClick={handlerOnClickFullSize}></div>
             <div onClick={handlerOnClickReSize}></div>
+            <div onClick={handlerOnClickFullSize}></div>
           </IconWrapper>
         </ModalHeader>
         <main>
-
+          {isDetailLoading ? (
+            <h1>Loading...</h1>
+          ) : (
+            <ModalMovieInfoWrapper>
+              <h1>{detailData?.title}</h1>
+              <ModalMovieInfo>
+                <img src={import.meta.env.VITE_IMG_PATH+detailData?.poster_path} alt='' />
+                <p>{detailData?.overview}</p>
+              </ModalMovieInfo>
+            </ModalMovieInfoWrapper>
+          )}
         </main>
       </Modal>
     </>
@@ -87,9 +104,10 @@ const MovieCards = styled.section`
   width: auto;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  //flex-wrap: wrap;
   height: auto;
   gap: 1rem;
+  overflow: scroll;
 `;
 const Modal = styled.div<{ $isOpen: boolean, $isFullSize: boolean }>`
   position: fixed;
@@ -97,8 +115,8 @@ const Modal = styled.div<{ $isOpen: boolean, $isFullSize: boolean }>`
   min-width: 120rem;
   height: ${({ $isFullSize }) => $isFullSize ? '100vh' : '80vh'};
   min-height: 50rem;
-  background-color: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(0.5rem);
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(0.8rem);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -148,5 +166,33 @@ const IconWrapper = styled.section`
     &:hover {
       opacity: 1;
     }
+  }
+`;
+
+const ModalMovieInfoWrapper = styled.section`
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  box-sizing: border-box;
+  color: var(--modal-text-color);
+  > h1 {
+    font-size: 8rem;
+    font-weight: bold;
+  }
+`;
+
+const ModalMovieInfo = styled.div`
+  margin-top: 3rem;
+  display: flex;
+  column-gap: 5rem;
+  > img {
+    width: 50%;
+    max-width: 50rem;
+    border-radius: var(--border-radius);
+  }
+  > p {
+    font-size: 2.4rem;
+    line-height: 1.4;
+    letter-spacing: 0.1rem;
   }
 `;

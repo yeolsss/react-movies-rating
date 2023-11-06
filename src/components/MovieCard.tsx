@@ -1,19 +1,17 @@
-import { MovieApi } from '../api/MovieApi.tsx';
+import {  IMovieApi } from '../api/IMovieApi.tsx';
 import styled from 'styled-components';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { getMovieId } from '../reducers/MovieReducer.tsx';
-
+import { useNavigate } from 'react-router-dom';
 
 interface IProps {
-  movieData: MovieApi;
+  movieData: IMovieApi;
   isModalOpen:  React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function MovieCard({ movieData, isModalOpen }: IProps) {
   const IMG_PATH = import.meta.env.VITE_IMG_PATH;
   const [mouseOver, setMouseOver] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const history = useNavigate();
 
   const handlerOnMouseOverMovieCard = () =>
     setMouseOver(true);
@@ -25,8 +23,8 @@ function MovieCard({ movieData, isModalOpen }: IProps) {
   const handlerOnClickMovie = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     const target = e.currentTarget as HTMLButtonElement;
-    const movieId =target.dataset.movieId;
-    dispatch(getMovieId({ movieId }));
+    const movieId = target.dataset.movieId;
+    history(`/movies/${movieId}`);
     isModalOpen(true);
   };
 
@@ -53,10 +51,13 @@ const StyledMovieCard = styled.section <{ $movieImage?: string, $isMouseOver?: b
   display: flex;
   position: relative;
   flex-direction: column;
-  width: 34.5rem;
+  flex: 1 1 min-content;
+  max-width: 15rem;
+  min-width: 10rem;
+  //width: 34.5rem;
+  height: 60rem;
   padding: 2rem 1rem;
   box-sizing: border-box;
-  height: 50rem;
   border-radius: var(--border-radius);
   overflow: hidden;
   color: var(--sub-text-color);
@@ -94,8 +95,8 @@ const StyledMovieCard = styled.section <{ $movieImage?: string, $isMouseOver?: b
     letter-spacing: 0.15rem;
     line-height: 1.8rem;
     overflow: scroll;
-    scrollbar-width: none;
     font-weight: bold;
+    scrollbar-width: none;
     &::-webkit-scrollbar {
       display: none;
     }

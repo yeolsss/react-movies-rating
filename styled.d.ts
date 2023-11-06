@@ -4,6 +4,7 @@ declare module "styled-components" {
   export interface DefaultTheme {
     textColor: string;
     subTextColor: string;
+    modalTextColor: string;
     bgColor: string;
     accentColor: string;
     boxShadowColor: string;

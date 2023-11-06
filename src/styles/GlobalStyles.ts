@@ -77,6 +77,7 @@ export const GlobalStyle = createGlobalStyle`
     --box-hover-color: ${(props) => props.theme.boxHoverColor};
 
     --modal-header: ${(props) => props.theme.modalHeaderBar};
+    --modal-text-color: ${(props) => props.theme.modalTextColor};
 
 
     --border-radius: 0.5rem;
