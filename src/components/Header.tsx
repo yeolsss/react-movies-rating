@@ -1,10 +1,9 @@
-import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { toggleTheme } from "../reducers/ThemeReducer.tsx";
+import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import { toggleTheme } from '../reducers/ThemeReducer.tsx';
 
 function Header() {
   const dispatch = useDispatch();
-
   const handleToggle = () => {
     dispatch(toggleTheme());
   };
@@ -43,4 +42,5 @@ const ToggleBtnWrapper = styled.div`
     }
   }
 `;
+
 export default Header;
