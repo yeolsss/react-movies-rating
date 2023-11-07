@@ -1,20 +1,33 @@
-import {  IMovieApi } from '../api/IMovieApi.tsx';
+import { IMovieApi } from '../api/IMovieApi.tsx';
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createLogger } from 'vite';
 
 interface IProps {
   movieData: IMovieApi;
-  isModalOpen:  React.Dispatch<React.SetStateAction<boolean>>;
+  isModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  index: number;
+  setMovieCardMouseOver: React.Dispatch<React.SetStateAction<string>>;
+  movieCardMouseOver: string;
 }
 
-function MovieCard({ movieData, isModalOpen }: IProps) {
+function MovieCard({
+                     movieData,
+                     isModalOpen,
+                     index,
+                     setMovieCardMouseOver,
+                     movieCardMouseOver,
+                   }: IProps) {
   const IMG_PATH = import.meta.env.VITE_IMG_PATH;
-  const [mouseOver, setMouseOver] = useState<boolean>(false);
-  const history = useNavigate();
 
-  const handlerOnMouseOverMovieCard = () =>
+  const history = useNavigate();
+  const [mouseOver, setMouseOver] = useState(false);
+
+  const handlerOnMouseOverMovieCard = (index: string) => {
     setMouseOver(true);
+    setMovieCardMouseOver(index);
+  };
 
   const handlerOnMouseLeaveMovieCard = () => {
     setMouseOver(false);
@@ -31,11 +44,11 @@ function MovieCard({ movieData, isModalOpen }: IProps) {
   return (
     <StyledMovieCard
       data-movie-id={movieData.id}
-      $movieImage={movieData.poster_path !== '' ? `${IMG_PATH + movieData.poster_path}` : ''}
+      $movieImage={movieData.poster_path !== '' ? `${IMG_PATH}${mouseOver ? movieData.backdrop_path : movieData.poster_path}` : ''}
       onClick={handlerOnClickMovie}
-      onMouseOver={handlerOnMouseOverMovieCard}
+      onMouseOver={() => handlerOnMouseOverMovieCard(movieData.id + '')}
       onMouseLeave={handlerOnMouseLeaveMovieCard}
-      $isMouseOver={mouseOver}>
+      $isMouseOver={movieData.id+'' === movieCardMouseOver}>
 
       <h1>{movieData.title}</h1>
       <div>
@@ -51,11 +64,12 @@ const StyledMovieCard = styled.section <{ $movieImage?: string, $isMouseOver?: b
   display: flex;
   position: relative;
   flex-direction: column;
-  flex: 1 1 min-content;
-  max-width: 15rem;
-  min-width: 10rem;
+  min-width: ${({ $isMouseOver }) => {
+    return $isMouseOver ? '80%' : '10rem';
+  }};
   //width: 34.5rem;
-  height: 60rem;
+  transition: min-width 0.3s ease-in;
+  height: 80rem;
   padding: 2rem 1rem;
   box-sizing: border-box;
   border-radius: var(--border-radius);
@@ -74,13 +88,17 @@ const StyledMovieCard = styled.section <{ $movieImage?: string, $isMouseOver?: b
     height: 100%;
     background-image: url('${({ $movieImage }) => $movieImage}');
     background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    object-fit: fill;
+
     z-index: -1;
   }
 
   > h1 {
     font-size: 2.4rem;
     font-weight: bold;
-    
+
   }
 
   > div {
@@ -97,6 +115,7 @@ const StyledMovieCard = styled.section <{ $movieImage?: string, $isMouseOver?: b
     overflow: scroll;
     font-weight: bold;
     scrollbar-width: none;
+
     &::-webkit-scrollbar {
       display: none;
     }

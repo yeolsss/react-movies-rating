@@ -9,10 +9,10 @@ import { useMatch } from 'react-router-dom';
 
 function Main() {
   const { isLoading, data } = useQuery<IMovieList>('moviePopular', getMovies);
-
   const [toggleModal, setToggleModal] = useState(false);
   const [fullSizeModal, setFullSizeModal] = useState(false);
 
+  const [movieCardMouseOver, setMovieCardMouseOver] = useState<string>('0');
 
   // get api
   const handlerOnClickModalToggle = () => {
@@ -25,6 +25,8 @@ function Main() {
   const handlerOnClickReSize = () => {
     setFullSizeModal(false);
   };
+
+
 
   const bigMovieMatch = useMatch('/movies/:movieId');
   const movieId = bigMovieMatch?.params.movieId;
@@ -39,14 +41,19 @@ function Main() {
       <Container>
         <Header />
         <MovieContainer>
-
           <h2>Movie List</h2>
           {isLoading ? (
             <h1>Loading...!</h1>
           ) : (
             <MovieCards>
-              {data?.results.map((movie: IMovieApi) => (
-                <MovieCard key={movie.id} movieData={movie} isModalOpen={setToggleModal} />
+              {data?.results.map((movie: IMovieApi, index) => (
+                <MovieCard 
+                key={movie.id} 
+                movieData={movie} 
+                isModalOpen={setToggleModal} 
+                index={index} 
+                setMovieCardMouseOver={setMovieCardMouseOver}
+                 movieCardMouseOver={movieCardMouseOver}/>
               ))}
             </MovieCards>
           )}
@@ -103,11 +110,29 @@ const MovieContainer = styled.section`
 const MovieCards = styled.section`
   width: auto;
   display: flex;
+  position: relative;
   flex-direction: row;
   //flex-wrap: wrap;
   height: auto;
   gap: 1rem;
   overflow: scroll;
+  scrollbar-width: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*&::before {
+    content: '';
+    position: absolute;
+    background-color: var(--main-bg-color);
+    opacity: 0.9;
+    top: 0;
+    left:0;
+    height: 100%;
+    width: 5rem;
+    backdrop-filter: blur(0.5rem);
+  }*/
 `;
 const Modal = styled.div<{ $isOpen: boolean, $isFullSize: boolean }>`
   position: fixed;
