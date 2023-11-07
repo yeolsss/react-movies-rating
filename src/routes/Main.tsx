@@ -1,17 +1,21 @@
-import Header from '../components/Header.tsx';
 import styled from 'styled-components';
 import { useQuery } from 'react-query';
-import { getMovieDetail, getMovies, IMovieApi, IMovieList, IMovieDetail } from '../api/IMovieApi.tsx';
-import MovieCard from '../components/MovieCard.tsx';
 import { useState } from 'react';
 import { useMatch } from 'react-router-dom';
-
+import Header from '../components/Header.tsx';
+import {
+  getMovieDetail,
+  getMovies,
+  IMovieApi,
+  IMovieList,
+  IMovieDetail,
+} from '../api/IMovieApi.tsx';
+import MovieCard from '../components/MovieCard.tsx';
 
 function Main() {
   const { isLoading, data } = useQuery<IMovieList>('moviePopular', getMovies);
   const [toggleModal, setToggleModal] = useState(false);
   const [fullSizeModal, setFullSizeModal] = useState(false);
-
   const [movieCardMouseOver, setMovieCardMouseOver] = useState<string>('0');
 
   // get api
@@ -22,19 +26,19 @@ function Main() {
   const handlerOnClickFullSize = () => {
     setFullSizeModal(true);
   };
+
   const handlerOnClickReSize = () => {
     setFullSizeModal(false);
   };
 
-
-
   const bigMovieMatch = useMatch('/movies/:movieId');
   const movieId = bigMovieMatch?.params.movieId;
-  const {
-    isLoading: isDetailLoading,
-    data: detailData,
-  } = useQuery<IMovieDetail>(['movie', movieId],
-    () => getMovieDetail(movieId || ''), { enabled: !!movieId });
+  const { isLoading: isDetailLoading, data: detailData } =
+    useQuery<IMovieDetail>(
+      ['movie', movieId],
+      () => getMovieDetail(movieId || ''),
+      { enabled: !!movieId },
+    );
 
   return (
     <>
@@ -47,22 +51,20 @@ function Main() {
           ) : (
             <MovieCards>
               {data?.results.map((movie: IMovieApi, index) => (
-                <MovieCard 
-                key={movie.id} 
-                movieData={movie} 
-                isModalOpen={setToggleModal} 
-                index={index} 
-                setMovieCardMouseOver={setMovieCardMouseOver}
-                 movieCardMouseOver={movieCardMouseOver}/>
+                <MovieCard
+                  key={movie.id}
+                  movieData={movie}
+                  isModalOpen={setToggleModal}
+                  index={index}
+                  setMovieCardMouseOver={setMovieCardMouseOver}
+                  movieCardMouseOver={movieCardMouseOver}
+                />
               ))}
             </MovieCards>
           )}
         </MovieContainer>
       </Container>
-      <Modal
-        $isOpen={toggleModal}
-        $isFullSize={fullSizeModal}
-      >
+      <Modal $isOpen={toggleModal} $isFullSize={fullSizeModal}>
         <ModalHeader>
           <IconWrapper>
             <div onClick={handlerOnClickModalToggle}></div>
@@ -77,7 +79,10 @@ function Main() {
             <ModalMovieInfoWrapper>
               <h1>{detailData?.title}</h1>
               <ModalMovieInfo>
-                <img src={import.meta.env.VITE_IMG_PATH+detailData?.poster_path} alt='' />
+                <img
+                  src={import.meta.env.VITE_IMG_PATH + detailData?.poster_path}
+                  alt=""
+                />
                 <p>{detailData?.overview}</p>
               </ModalMovieInfo>
             </ModalMovieInfoWrapper>
@@ -117,7 +122,7 @@ const MovieCards = styled.section`
   gap: 1rem;
   overflow: scroll;
   scrollbar-width: none;
-  
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -134,11 +139,11 @@ const MovieCards = styled.section`
     backdrop-filter: blur(0.5rem);
   }*/
 `;
-const Modal = styled.div<{ $isOpen: boolean, $isFullSize: boolean }>`
+const Modal = styled.div<{ $isOpen: boolean; $isFullSize: boolean }>`
   position: fixed;
-  width: ${({ $isFullSize }) => $isFullSize ? '100vw' : '80vw'};
+  width: ${({ $isFullSize }) => ($isFullSize ? '100vw' : '80vw')};
   min-width: 120rem;
-  height: ${({ $isFullSize }) => $isFullSize ? '100vh' : '80vh'};
+  height: ${({ $isFullSize }) => ($isFullSize ? '100vh' : '80vh')};
   min-height: 50rem;
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(0.8rem);
@@ -148,15 +153,17 @@ const Modal = styled.div<{ $isOpen: boolean, $isFullSize: boolean }>`
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 0.2rem 0.5rem #555e;
-  transition: opacity 0.3s ease-in, width 0.3s ease-in, height 0.3s ease-in;
-  opacity: ${({ $isOpen }) => $isOpen ? '1' : '0'};
-  pointer-events: ${({ $isOpen }) => $isOpen ? 'auto' : 'none'};
+  transition:
+    opacity 0.3s ease-in,
+    width 0.3s ease-in,
+    height 0.3s ease-in;
+  opacity: ${({ $isOpen }) => ($isOpen ? '1' : '0')};
+  pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
 `;
 
 const ModalHeader = styled.header`
   height: 5rem;
   background-color: var(--modal-header);
-
 `;
 
 const IconWrapper = styled.section`
@@ -173,7 +180,7 @@ const IconWrapper = styled.section`
     border-radius: 1rem;
     transition: opacity 0.2s ease-in;
     cursor: pointer;
-    opacity: .6;
+    opacity: 0.6;
 
     &:first-child {
       background-color: #eb3b5a;
